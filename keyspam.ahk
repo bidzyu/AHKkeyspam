@@ -15,7 +15,7 @@ global shouldReboot := false
 global active := true
 
 FillStuckKeysArray()
-FillArray()
+FillPressDurationArray()
 SetTimer, AllChecks, %TIMER_FREQUENCY%
 return
 
@@ -37,8 +37,8 @@ AllChecks() {
   }  
 }
 
-FillStuckKeysArray() {
-  index := 1
+FillStuckKeysArray() { 
+  index := 0
 
   for key, s in KEYS_TO_REPEAT {
     pressedKeysList[index] := key
@@ -46,7 +46,7 @@ FillStuckKeysArray() {
   }
 }
 
-FillArray() {
+FillPressDurationArray() {
   for i, key in pressedKeysList {
     pressDurationList[i] := 0
   }
@@ -93,7 +93,7 @@ CheckKeys() {
                  combo := shiftState . ctrlState . altState . (currentLayout ? symbol : key)
                  ; Отправляем комбинацию клавиш
                  Send, %combo%
-                 Sleep, %TIMER_FREQUENCY% ; Минимальная задержка между нажатиями
+                 Sleep, %TIMER_FREQUENCY%
              }
         }
     }
@@ -101,7 +101,7 @@ CheckKeys() {
 }
 
 UpdAllPressedKeys() {
-    keyStatus := "" ; Для хранения статуса клавиш
+    ; keyStatus := "" ; Для хранения статуса клавиш
     
     for i, key in pressedKeysList {
 	keyState := GetKeyState(key, "P") ; Проверяем физическое состояние клавиши
@@ -111,14 +111,14 @@ UpdAllPressedKeys() {
 	  pressDurationList[i] := 0
         }
 
-        keyStatus .= pressedKeysList[i] ": " pressDurationList[i] "`n" ; Добавляем информацию о состоянии клавиши
+        ; keyStatus .= pressedKeysList[i] ": " pressDurationList[i] "`n" ; Добавляем информацию о состоянии клавиши
 	
     }
 
-    keyStatus .= "press: " keysPressStatus "`n"
+    ; keyStatus .= "press: " keysPressStatus "`n"
 
-    ToolTip, % "Key Status:`n" keyStatus ; Отображаем статус всех клавиш
-    SetTimer, RemoveToolTip, 1000 ; Убираем ToolTip через 1 секунду
+    ; ToolTip, % "Key Status:`n" keyStatus ; Отображаем статус всех клавиш
+    ; SetTimer, RemoveToolTip, 1000 ; Убираем ToolTip через 1 секунду
     return
 }
 
@@ -138,7 +138,7 @@ toggleActive() {
     }
 }
 
-; Горячая клавиша для запуска/остановки (стрелочка вверх)
+; Горячая клавиша для запуска/остановки
 Up:: toggleActive()
 
 CenteredToolTip(text, duration = 999) {
