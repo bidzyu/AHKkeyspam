@@ -7,13 +7,14 @@ ListLines Off
 global PRESS_TICK_LIMIT := 30
 global TIMER_FREQUENCY := 10
 global KEYS_TO_REPEAT := { "1": "1", "2": "2", "3": "3", "4": "4", "e": "у", "r": "к", "q": "й", "c": "с", "x": "ч" }
-global PRESSED_KEYS_LIST := ["1", "2", "3", "4", "e", "r", "q", "c", "x"]
 
+global pressedKeysList := Array()
 global pressDurationList := Array()
 global keysPressStatus := false
 global shouldReboot := false
 global active := true
 
+FillStuckKeysArray()
 FillArray()
 SetTimer, AllChecks, %TIMER_FREQUENCY%
 return
@@ -36,8 +37,17 @@ AllChecks() {
   }  
 }
 
+FillStuckKeysArray() {
+  index := 1
+
+  for key, s in KEYS_TO_REPEAT {
+    pressedKeysList[index] := key
+    index += 1
+  }
+}
+
 FillArray() {
-  for i, key in PRESSED_KEYS_LIST {
+  for i, key in pressedKeysList {
     pressDurationList[i] := 0
   }
 }
@@ -91,9 +101,9 @@ CheckKeys() {
 }
 
 UpdAllPressedKeys() {
-    ; keyStatus := "" ; Для хранения статуса клавиш
+    keyStatus := "" ; Для хранения статуса клавиш
     
-    for i, key in PRESSED_KEYS_LIST {
+    for i, key in pressedKeysList {
 	keyState := GetKeyState(key, "P") ; Проверяем физическое состояние клавиши
 	if (keyState) {
           pressDurationList[i]++
@@ -101,14 +111,14 @@ UpdAllPressedKeys() {
 	  pressDurationList[i] := 0
         }
 
-        ; keyStatus .= PRESSED_KEYS_LIST[i] ": " pressDurationList[i] "`n" ; Добавляем информацию о состоянии клавиши
+        keyStatus .= pressedKeysList[i] ": " pressDurationList[i] "`n" ; Добавляем информацию о состоянии клавиши
 	
     }
 
-    ; keyStatus .= "press: " keysPressStatus "`n"
+    keyStatus .= "press: " keysPressStatus "`n"
 
-    ; ToolTip, % "Key Status:`n" keyStatus ; Отображаем статус всех клавиш
-    ; SetTimer, RemoveToolTip, 1000 ; Убираем ToolTip через 1 секунду
+    ToolTip, % "Key Status:`n" keyStatus ; Отображаем статус всех клавиш
+    SetTimer, RemoveToolTip, 1000 ; Убираем ToolTip через 1 секунду
     return
 }
 
